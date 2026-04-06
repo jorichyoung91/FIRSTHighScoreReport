@@ -1,3 +1,3 @@
-del hiscores.txt
+del hiscores_normalized.txt
 python -u TbaScores.py -n 2>&1 | wtee hiscores_normalized.txt
 pause
