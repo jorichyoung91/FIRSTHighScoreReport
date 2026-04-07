@@ -14,7 +14,7 @@ evntURLs = []
 
 HighestScore = 0
 
-currScoreDict = {}
+# currScoreDict = {}
 HighestScoreDict = {}
 allScores = []
 currWeek = ""

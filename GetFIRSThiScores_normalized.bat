@@ -1,3 +1,3 @@
 del hiscores_normalized.txt
-python -u TbaScores.py -n 2>&1 | wtee hiscores_normalized.txt
+powershell "python TbaScores.py -n | tee hiscores_normalized.txt"
 pause

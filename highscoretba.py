@@ -223,10 +223,6 @@ def get_high_score(URL, week, normalizeScores):
         #
         
         lineNum += 1
-
-
-    if "Match " in HiScoreDict["HiScoreMatchName"]:
-        HiScoreDict["HiScoreMatchName"] = HiScoreDict["HiScoreMatchName"]
     
     # Remove non-ascii characters from Event Name
     HiScoreDict["EventName"] = str(normalize('NFKD', HiScoreDict["EventName"]).encode('ascii','ignore'))
