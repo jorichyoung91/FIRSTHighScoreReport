@@ -27,26 +27,29 @@ if len(sys.argv) > 1:
     elif sys.argv[1] != "":
         print("Warning: unrecognized command entered: ", sys.argv[1])
 
+# Get html page from the blue alliance events page
 response = requests.get(mainTbaURL)
 html_data = response.text
 html_data = html_data.split('\n')
 
+# Use regex to find event names and construct URLs
 for line in html_data:
     r = re.search(r'<a href="/event/([^"]+)', line)
     if r is not None:
         evntURLs.append(["https://www.thebluealliance.com/event/" + r.group(1), currWeek])
     
-    s = re.search(r'<h2 id="[\w|-]+">([\w|\s|\d]+)\s', line)
+    s = re.search(r'<h2 id="[\w|-]+">([\w|\s]+)\s', line)
     if s is not None:
         currWeek = s.group(1)
         
-# call high score subroutine for events in parallel
+# call high score function for each event in parallel
 results = Parallel(n_jobs=numThreads)(delayed(get_high_score)(event[0], event[1], normalizeScores) for event in evntURLs)
 
 for result in results:
     if result["HiScore"] > HighestScore:
         HighestScore = result["HiScore"]
         HighestScoreDict = result
+    # Create dictionary subset that doesnt have events with no scores, and to only have event name, week, high score, and the match with that score
     if result["HiScore"] != 0:
         allScores.append({'Event': result['EventName'], 'Week': result['EventWeek'], 'Match': result['HiScoreMatchName'], 'High Score': result['HiScore']})
 #
@@ -60,6 +63,7 @@ for result in results:
     # allScores.append({'Event': currScoreDict['EventName'], 'Week': currScoreDict['EventWeek'], 'High Score': currScoreDict['HiScore']})
 #
 
+# Create and print table of high score from each event
 allScores = sorted(allScores, key=lambda d: d['High Score'], reverse=True)
 
 header = allScores[0].keys()

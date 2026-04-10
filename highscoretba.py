@@ -17,6 +17,13 @@ def get_foul_points(URL):
     html_data = html_data.split('\n')
     
     for line in html_data:
+        # The keys 'redScore' and 'blueScore' are used multiple times in the same page. We are only concerned with the Foul Points.
+        # The way the html table is construction has the format:
+        # redScore 5
+        # Foul Points
+        # blueScore 0
+        #
+        # So we must save every 'redScore' we find, overwriting the last in tempRedFoul, until we find the 'Foul Points' tag, and then save/return those values.
         if redFound:
             p = re.search(r'^\s+(\d+)', line)
             if p is not None:
@@ -64,8 +71,10 @@ def get_high_score(URL, week, normalizeScores):
         "RedTeams": [],
         "BlueTeams": []
     }
-
-    oldHighScoreDict = copy.deepcopy(HiScoreDict)   # store last high score found when normalizing to reset if needed
+    
+    # Store last high score found when normalizing to reset if needed.
+    # deepcopy must be used as assigning one dictionary to another only sets them to the same reference in memory.
+    oldHighScoreDict = copy.deepcopy(HiScoreDict)
     
     HiScoreDict["EventWeek"] = week
 
@@ -76,32 +85,31 @@ def get_high_score(URL, week, normalizeScores):
     newHighScore = False
     
     for line in html_data:
-        # blank line
+        # Blank line, ignore.
         if line == '':
             lineNum += 1
             continue
         
-        # Page with no scores on it, skip
+        # Page with no scores on it, skip.
         if currMatchidx == 0:
             if '<li class="active"><a href="#teams"' in line:
                 return HiScoreDict
         #
         
-        # get event name
+        # Get event name.
         if HiScoreDict["EventName"] == '':
-            # s = re.search(r'<h1 itemprop="summary" id="event-name">([^<]+)', line) - old regex 2025
-            s = re.search(r'<h1 id="event-name">([^<]+)', line)
+            s = re.search(r'<h1 [\w|=|"]*\s?id="event-name">([^<]+)', line)
             if s is not None:
                 HiScoreDict["EventName"] = s.group(1)
                 HiScoreDict["EventName"] = HiScoreDict["EventName"].replace(" 2026", "")
         #
         
-        # found a new match
+        # Found a new match.
         if '<tr class="visible-lg">' in line:
             currMatchidx = lineNum
         #
         
-        # found a score value, check against HiScore
+        # Found a score value, check against HiScore.
         if scoreFound:
             n = re.search(r'  <span[^>]*>(\d+)', line)
             if n is not None:
@@ -112,7 +120,7 @@ def get_high_score(URL, week, normalizeScores):
                 scoreFound = False
         #
         
-        # found a team score
+        # Found a team score.
         m = re.search(r'<td class="\w+Score">', line)
         if m is not None:
             scoreFound = True
@@ -125,14 +133,16 @@ def get_high_score(URL, week, normalizeScores):
         redFoulPoints = 0
         blueFoulPoints = 0
         
-        # new high score found, get teams and match info
+        # New high score found, get teams and match info.
         if '<tr class="hidden-lg compact-row">' in line and newHighScore:
             HiScoreDict["BlueTeams"].clear()
             HiScoreDict["RedTeams"].clear()
+            # Re-iterate from when we first found the match until the current line.
             for nline in html_data[currMatchidx:lineNum+1]:
                 if nline == '':
                     continue
                 
+                # Get found points awarded to each team.
                 if normalizeScores:
                     s = re.search('<a href="(/match/[^"]+)', nline)
                     if s is not None:
@@ -168,6 +178,7 @@ def get_high_score(URL, week, normalizeScores):
                     elif p.group(1) == 'red':
                         currTeamColor = "Red"
                     
+                    # If there is a space in the red/blue team tag, it must say "red/blue winner". Losing team has no space here.
                     if p.group(2) == ' ':
                         HiScoreDict["WinningTeam"] = currTeamColor
                         
@@ -180,7 +191,7 @@ def get_high_score(URL, week, normalizeScores):
             newHighScore = False
             loserTeamHighScore = False
             
-            # subtract penalty points if normalize argument is passed
+            # Subtract penalty points if normalize argument is passed.
             if normalizeScores:
                 resetHiScore = False
                 normalizedHighScore = 0
@@ -200,6 +211,14 @@ def get_high_score(URL, week, normalizeScores):
                 normalizedHighScore = HiScoreDict["HiScore"] - winningFoulPoints
                 normalizedLosingScore = HiScoreDict["LosingTeamScore"] - LosingFoulPoints
                 
+                # First check if normalized high score is less than the old high score found - if so, check if the normalized losing score is higher than the old high score.
+                # If the normalized losing score is now the highest score, we must flip around the losing/winning scores and WinningTeam values.
+                #
+                # example scenario - Match 1 is Red Team 10 and Blue Team 15 with no penalty points.
+                # Match 2 is Red Team 20 and Blue Team 50 with Blue Team being awarded 40 penalty points.
+                # After normalizing, Red Team has 20 and Blue Team has 10. So we must now show that red team is the "winner" with their normalized score of 20.
+                #
+                # If the normalized losing score is not the highest score, and the normalized winning score is less than the old high score, reset the HiScoreDict to its old value.
                 if normalizedHighScore < oldHighScoreDict["HiScore"]:
                     if normalizedLosingScore > oldHighScoreDict["HiScore"]:
                         loserTeamHighScore = True
@@ -215,6 +234,7 @@ def get_high_score(URL, week, normalizeScores):
                             
                 if resetHiScore:
                     HiScoreDict = copy.deepcopy(oldHighScoreDict)
+                # If normalized high score is actually the highest, set them in HiScoreDict and make a copy of the dictionary in oldHighScoreDict.
                 elif not loserTeamHighScore:
                     HiScoreDict["HiScore"] = normalizedHighScore
                     HiScoreDict["LosingTeamScore"] = normalizedLosingScore
@@ -224,17 +244,18 @@ def get_high_score(URL, week, normalizeScores):
         
         lineNum += 1
     
-    # Remove non-ascii characters from Event Name
+    # Remove non-ascii characters and escaped characters from Event Name.
     HiScoreDict["EventName"] = str(normalize('NFKD', HiScoreDict["EventName"]).encode('ascii','ignore'))
     HiScoreDict["EventName"] = HiScoreDict["EventName"].replace('b\'', '')
     HiScoreDict["EventName"] = HiScoreDict["EventName"].replace('\'', '')
+    HiScoreDict["EventName"] = HiScoreDict["EventName"].replace('amp;', '')
 
     if HiScoreDict["HiScore"] > 0:
-        # store output in one big string to avoid out-of-order printing when parallelized
+        # Store output in one big string to avoid out-of-order printing when parallelized.
         consoleText = ("*"*75) + '\n' + \
         HiScoreDict["EventName"] + '\n' + \
         '\n' + \
-        "The high score was " + HiScoreDict["HiScoreMatchName"] + " with " + HiScoreDict["WinningTeam"] +" Team winning " + str(HiScoreDict["HiScore"]) + " to " + str(HiScoreDict["LosingTeamScore"]) + "." + '\n' + \
+        "The high score was in " + HiScoreDict["HiScoreMatchName"] + " with " + HiScoreDict["WinningTeam"] +" Team winning " + str(HiScoreDict["HiScore"]) + " to " + str(HiScoreDict["LosingTeamScore"]) + "." + '\n' + \
         "Blue Team - " + str(HiScoreDict["BlueTeams"][0]) + " " + str(HiScoreDict["BlueTeams"][1]) + " " + str(HiScoreDict["BlueTeams"][2]) + '\n' + \
         "Red Team - " + str(HiScoreDict["RedTeams"][0]) + " " + str(HiScoreDict["RedTeams"][1]) + " " + str(HiScoreDict["RedTeams"][2]) + '\n' + \
         "*"*75 + '\n'
@@ -245,7 +266,7 @@ def get_high_score(URL, week, normalizeScores):
 
 
 if __name__ == '__main__':
-    # executed as script
+    # Executed as main script:
     # URL = "https://www.thebluealliance.com/event/2025mimil"
     # URL = 'https://www.thebluealliance.com/event/2025iscmp'
     URL = 'https://www.thebluealliance.com/event/2025tuis3'

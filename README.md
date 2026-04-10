@@ -65,6 +65,8 @@ The number of threads can be customized by changing the variable 'numThreads'
 5. Results are returned as a dictionary and appended to the array 'results'
 6. The results are iterated through to find the highest score, and sorted
 7. The sorted dictionaries are printed to console with a summary of the highest score
+<br>
+<br>
 
 ### highscoretba.py
 #### get_foul_points
@@ -77,4 +79,4 @@ The number of threads can be customized by changing the variable 'numThreads'
 3. When a score is found for that event, it is compared to the current highest score found. If a new high score is found, more information is obtained from html_data
 4. html tags are used to find that match's URL, match name, and teams playing in that match
 5. If scores are being normalized, calls get_foul_points with the match URL to retrieve foul points
-6. Results for this event are printed to console and returned
+6. Results for this event are printed to console and returned to parent function
