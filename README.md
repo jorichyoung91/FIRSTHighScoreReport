@@ -5,7 +5,7 @@
 Python must be installed, version 3.13 or higher is recommended.
 
 ### Usage
-#### Run the following command before first run to ensure all required python packages are installed:
+#### Run the following command in the repository directory before first run to ensure all required python packages are installed:
 ```
 pip install -r requirements.txt
 ```
@@ -53,14 +53,14 @@ This creates hiscores_normalized.txt which has the same format shown above.
 ```
 powershell "python TbaScores.py | tee hiscores.txt"
 ```
-powershell is used in order to utilize the built-in 'tee' command. Output can be shown to console and written to file.
+powershell is used in order to utilize the built-in 'tee' command. Output is shown to console and written to file.
 
 ### TbaScores.py
 1. Looks for '-n' option to normalize scores
 2. Uses request library to retrieve html data from https://www.thebluealliance.com/events
 3. Creates an array of Event URLs (e.g. https://www.thebluealliance.com/event/2026midtr)
 4. For each entry in the Event URL array, a thread is invoked via the Parallel function from the joblib library to call get_high_score from highscoretba.py.
-The event url, week number, and normalize score argument are passed in. By default, number of jobs is set to 56 for 56 threads
+The event url, week number, and normalize score argument are passed in. By default, number of jobs is set to 56 for 56 threads <br>
 The number of threads can be customized by changing the variable 'numThreads'
 5. Results are returned as a dictionary and appended to the array 'results'
 6. The results are iterated through to find the highest score, and sorted
