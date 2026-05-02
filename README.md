@@ -17,21 +17,21 @@ pip install -r requirements.txt
 
 To create a report, run GetFIRSThiScores.bat -> this will output hiscores.txt with the following formatting:
 
+```
 ...  
-\***************************************************************************  
+***************************************************************************  
 NE District WPI Event  
   
 The high score was Quals 60 with Blue Team winning 669 to 165.  
 Blue Team - 4628 1768 3467  
 Red Team - 1474 3205 2168  
-\***************************************************************************  
-  
+***************************************************************************  
   
 Event                                            Week       Match               High Score  
-\-----------------------------------------------------------------------------------------------  
+-----------------------------------------------------------------------------------------------  
 CA District Central Valley Event                 Week 4     Playoff Match 1            825  
 Avrasya Regional                                 Week 5     Playoff Match 7            769  
-...  
+...
   
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  
 The highest score for this year is 825 at CA District Central Valley Event:  
@@ -41,7 +41,8 @@ Red Team - 1323 2367 254
 Blue Team - 11296 1351 1671  
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!  
   
-\--- Execution time: 13.69 seconds ---  
+--- Execution time: 13.69 seconds ---  
+```
 <br>
 <br>
   
