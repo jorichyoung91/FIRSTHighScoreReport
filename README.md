@@ -4,6 +4,11 @@
 ### Requirements
 Python must be installed, version 3.13 or higher is recommended.
 
+### Config
+| Value | Description |
+| :---- | :---------- |
+| numThreads | Set on line 12 of TbaScores.py. Configures how many threads are invoked when the script is ran. Default value is 56.|
+
 ### Usage
 #### Run the following command in the repository directory before first run to ensure all required python packages are installed:
 ```
@@ -58,14 +63,13 @@ powershell is used in order to utilize the built-in 'tee' command. Output is sho
 ### TbaScores.py
 1. Looks for '-n' option to normalize scores.
 2. Uses request library to retrieve html data from https://www.thebluealliance.com/events.
-3. Creates an array of Event URLs. (e.g. https://www.thebluealliance.com/event/2026midtr)
+3. Creates an array of Event URLs (e.g. https://www.thebluealliance.com/event/2026midtr/feed).
 4. For each entry in the Event URL array, a thread is invoked via the Parallel function from the joblib library to call get_high_score from highscoretba.py.
-The event url, week number, and normalize score argument are passed in. By default, number of jobs is set to 56 for 56 threads. <br>
+The event url, week number, and normalize score argument are passed in. By default, number of jobs is set to 56 for 56 threads.
 The number of threads can be customized by changing the variable 'numThreads'.
 5. Results are returned as a dictionary and appended to the array 'results'.
 6. The results are iterated through to find the highest score, and sorted.
 7. The sorted dictionaries are printed to console with a summary of the highest score.
-<br>
 <br>
 
 ### highscoretba.py
@@ -74,9 +78,9 @@ The number of threads can be customized by changing the variable 'numThreads'.
 2. Parses html data to find foul points awarded to red and blue teams, and returns them.
 
 #### get_high_score
-1. Retrieves html data from the supplied URL (e.g. https://www.thebluealliance.com/event/2026midtr).
-2. Parses html data to find certain html tags that give information such as event name, and scores for current match.
-3. When a score is found for that event, it is compared to the current highest score found. If a new high score is found, more information is obtained from html_data.
-4. html tags are used to find that match's URL, match name, and teams playing in that match.
+1. Retrieves RSS feed data from the supplied URL (e.g. https://www.thebluealliance.com/event/2026midtr/feed).
+2. Parses RSS feed data to retrieve information such as event name, and scores for current match.
+3. When a score is found for that event, it is compared to the current highest score found. If a new high score is found, more information is obtained from RSS feed data.
+4. RSS tags are used to find that match's URL, match name, and teams playing in that match.
 5. If scores are being normalized, calls get_foul_points with the match URL to retrieve foul points.
 6. Results for this event are printed to console and returned to parent function.
