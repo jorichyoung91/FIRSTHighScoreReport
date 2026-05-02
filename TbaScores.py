@@ -36,7 +36,7 @@ html_data = html_data.split('\n')
 for line in html_data:
     r = re.search(r'<a href="/event/([^"]+)', line)
     if r is not None:
-        evntURLs.append(["https://www.thebluealliance.com/event/" + r.group(1), currWeek])
+        evntURLs.append(["https://www.thebluealliance.com/event/" + r.group(1) + '/feed', currWeek])
     
     s = re.search(r'<h2 id="[\w|-]+">([\w|\s]+)\s', line)
     if s is not None:
@@ -81,7 +81,11 @@ else:
     
 print('')
 
-print(HighestScoreDict["WinningTeam"] + " won " + str(HighestScore) + " to " + str(HighestScoreDict["LosingTeamScore"]) + " in " + HighestScoreDict["HiScoreMatchName"] + ".")
+if HighestScoreDict["WinningTeam"] != "TIE":
+    print(HighestScoreDict["WinningTeam"] + " won " + str(HighestScore) + " to " + str(HighestScoreDict["LosingTeamScore"]) + " in " + HighestScoreDict["HiScoreMatchName"] + ".")
+else:
+    print("There was a tie with a score of " + str(HighestScore) + " in " + HighestScoreDict["HiScoreMatchName"] + ".")
+    
 print("Red Team - " + str(HighestScoreDict["RedTeams"][0]) + " " + str(HighestScoreDict["RedTeams"][1]) + " " + str(HighestScoreDict["RedTeams"][2]))
 print("Blue Team - " + str(HighestScoreDict["BlueTeams"][0]) + " " + str(HighestScoreDict["BlueTeams"][1]) + " " + str(HighestScoreDict["BlueTeams"][2]))
 
