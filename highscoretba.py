@@ -94,12 +94,6 @@ def get_high_score(URL, week, normalizeScores):
             lineNum += 1
             continue
         
-        # Page with no scores on it, skip.
-        # if currMatchidx == 0:
-            # if '<li class="active"><a href="#teams"' in line:
-                # return HiScoreDict
-        #
-        
         # Get event name.
         if HiScoreDict["EventName"] == '':
             s = re.search(r'<title>(.+)</title>', line) # First <title> entry is event name
