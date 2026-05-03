@@ -4,6 +4,12 @@
 ### Requirements
 Python must be installed, version 3.13 or higher is recommended.
 
+### Arguments
+| Argument | Description |
+| :------- | :---------- |
+| -n | Normalize high score - Subtracts foul points gained from final score. |
+| -y | Year - Gets high score from entered year. If none entered, defaults to current year. |
+
 ### Config
 | Value | Description |
 | :---- | :---------- |
